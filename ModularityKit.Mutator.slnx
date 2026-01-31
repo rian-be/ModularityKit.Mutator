@@ -2,6 +2,7 @@
   <Folder Name="/Polygon/">
     <Project Path="Polygon/BillingQuotas/BillingQuotas.csproj" />
     <Project Path="Polygon/FeatureFlags/FeatureFlags.csproj" />
+    <Project Path="Polygon/IamRoles/IamRoles.csproj" />
   </Folder>
   <Project Path="ModularityKit.Mutator/ModularityKit.Mutator.csproj" />
 </Solution>
