@@ -3,6 +3,7 @@
     <Project Path="Polygon/BillingQuotas/BillingQuotas.csproj" />
     <Project Path="Polygon/FeatureFlags/FeatureFlags.csproj" />
     <Project Path="Polygon/IamRoles/IamRoles.csproj" />
+    <Project Path="Polygon/WorkflowApprovals/WorkflowApprovals.csproj" />
   </Folder>
   <Project Path="ModularityKit.Mutator/ModularityKit.Mutator.csproj" />
 </Solution>

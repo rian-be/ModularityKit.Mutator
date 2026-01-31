@@ -1,0 +1,40 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using ModularityKit.Mutator.Abstractions;
+using ModularityKit.Mutator.Abstractions.Engine;
+using ModularityKit.Mutator.Runtime;
+using WorkflowApprovals.Policies;
+
+namespace WorkflowApprovals;
+
+internal static class Program
+{
+    private static async Task Main()
+    {
+        var services = new ServiceCollection();
+        services.AddMutators(MutationEngineOptions.Strict, addDefaultLoggingInterceptor: true);
+       
+        var provider = services.BuildServiceProvider();
+        var engine = provider.GetRequiredService<IMutationEngine>();
+        
+        engine.RegisterPolicy(new EnforceOrderPolicy());
+        engine.RegisterPolicy(new RequireManagerApprovalPolicy());
+        
+        Console.WriteLine("=== ModularityKit.Mutators - Complete Example ===\n");
+        
+        await Scenarios.HappyPathScenario.Run(engine);
+        await Scenarios.RejectedScenario.Run(engine);
+
+        
+        Console.WriteLine("\n METRICS & STATISTICS");
+
+        var stats = await engine.GetStatisticsAsync();
+
+        Console.WriteLine($"\n Mutation Statistics:");
+        Console.WriteLine($"  Total executed: {stats.TotalExecuted}");
+
+        Console.WriteLine($"\n Performance Metrics:");
+        Console.WriteLine($"  Average execution time: {stats.AverageExecutionTime.TotalMilliseconds:F2} ms");
+        Console.WriteLine($"  Median execution time: {stats.MedianExecutionTime.TotalMilliseconds:F2} ms");
+        Console.WriteLine($"  P95 execution time: {stats.P95ExecutionTime.TotalMilliseconds:F2} ms");
+    }
+}
