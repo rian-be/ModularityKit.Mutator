@@ -29,7 +29,7 @@ public class MutationException : Exception
     /// Initializes a new instance of <see cref="MutationException"/> with a specified message.
     /// </summary>
     /// <param name="message">Human-readable description of the error.</param>
-    protected MutationException(string message)
+    public MutationException(string message)
         : base(message)
     {
     }
@@ -40,7 +40,7 @@ public class MutationException : Exception
     /// </summary>
     /// <param name="message">Human-readable description of the error.</param>
     /// <param name="innerException">The underlying exception that triggered this error.</param>
-    protected MutationException(string message, Exception innerException)
+    public MutationException(string message, Exception innerException)
         : base(message, innerException)
     {
     }
