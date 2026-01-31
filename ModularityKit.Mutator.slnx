@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Polygon/">
     <Project Path="Polygon/BillingQuotas/BillingQuotas.csproj" />
+    <Project Path="Polygon/FeatureFlags/FeatureFlags.csproj" />
   </Folder>
   <Project Path="ModularityKit.Mutator/ModularityKit.Mutator.csproj" />
 </Solution>

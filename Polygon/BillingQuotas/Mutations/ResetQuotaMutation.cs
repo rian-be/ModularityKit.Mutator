@@ -4,6 +4,7 @@ using ModularityKit.Mutator.Abstractions.Context;
 using ModularityKit.Mutator.Abstractions.Engine;
 using ModularityKit.Mutator.Abstractions.Intent;
 using ModularityKit.Mutator.Abstractions.Results;
+using ValidationResult = ModularityKit.Mutator.Abstractions.Results.ValidationResult;
 
 namespace BillingQuotas.Mutations;
 

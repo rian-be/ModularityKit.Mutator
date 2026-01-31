@@ -1,10 +1,11 @@
-﻿using BillingQuotas.Policies;
+﻿using FeatureFlags.Policies;
 using Microsoft.Extensions.DependencyInjection;
 using ModularityKit.Mutator.Abstractions;
 using ModularityKit.Mutator.Abstractions.Engine;
 using ModularityKit.Mutator.Runtime;
+using ModularityKit.Mutator.Runtime.Loggers;
 
-namespace BillingQuotas;
+namespace FeatureFlags;
 
 internal static class Program
 {
@@ -15,14 +16,19 @@ internal static class Program
        
         var provider = services.BuildServiceProvider();
         var engine = provider.GetRequiredService<IMutationEngine>();
-       
-        engine.RegisterPolicy(new MaxQuotaPolicy());
-        engine.RegisterPolicy(new PreventNegativeQuotaPolicy());
         
+        //engine.RegisterPolicy(new BusinessHoursPolicy());
+        engine.RegisterPolicy(new RequireTwoManApprovalPolicy());
+
         Console.WriteLine("=== ModularityKit.Mutators - Complete Example ===\n");
         
-        await Scenarios.EmergencyIncreaseScenario.Run(engine);
-        await Scenarios.MonthlyResetScenario.Run(engine);
+        await Scenarios.EnableNewCheckoutScenario.Run(engine);
+        await Scenarios.DisableLegacyCheckoutScenario.Run(engine);
+        await Scenarios.BatchFeatureToggleScenario.Run(engine);
+
+        var history = await engine.GetHistoryAsync(stateId: "EnableNewCheckout");
+        MutationHistoryLogger.LogHistory(history);
+        
         Console.WriteLine("\n METRICS & STATISTICS");
 
         var stats = await engine.GetStatisticsAsync();
