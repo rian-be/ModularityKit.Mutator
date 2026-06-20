@@ -1,0 +1,51 @@
+- name: bug
+  color: "d73a4a"
+  description: Something is broken or incorrect
+
+- name: enhancement
+  color: "a2eeef"
+  description: New functionality or behavior
+
+- name: documentation
+  color: "0075ca"
+  description: Documentation updates and additions
+
+- name: architecture
+  color: "8B5E3C"
+  description: Design, structure, and API-shape changes
+
+- name: abstractions
+  color: "5B4B8A"
+  description: Public abstractions and contracts
+
+- name: runtime
+  color: "8A4F7D"
+  description: Runtime implementation and execution flow
+
+- name: examples
+  color: "1d76db"
+  description: Runnable examples and sample apps
+
+- name: ci
+  color: "5319e7"
+  description: CI/CD and repository automation changes
+
+- name: tests
+  color: "fbca04"
+  description: Test coverage and test changes
+
+- name: performance
+  color: "0e4d92"
+  description: Performance improvements or regressions
+
+- name: benchmark
+  color: "5319e7"
+  description: Benchmark coverage and performance measurement changes
+
+- name: breaking-change
+  color: "b60205"
+  description: Introduces a breaking change
+
+- name: skip-changelog
+  color: "ededed"
+  description: Exclude this change from release notes
