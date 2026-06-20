@@ -1,0 +1,97 @@
+name: Pull Request Automation
+
+on:
+  pull_request_target:
+    types: [ opened, edited, synchronize, reopened, ready_for_review, labeled, unlabeled ]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  assign-author:
+    if: github.event.action == 'opened' || github.event.action == 'ready_for_review'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Assign PR author
+        uses: kentaro-m/auto-assign-action@v2.0.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/config/auto-assign.yml
+
+  title-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check PR title
+        uses: thehanimo/pr-title-checker@v1.4.3
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pass_on_octokit_error: false
+          configuration_path: .github/config/pr-title-checker.json
+
+  labeler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Label changed files
+        uses: actions/labeler@v6
+        with:
+          configuration-path: .github/config/labeler.yml
+          sync-labels: true
+
+  performance-labeler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Apply Performance label from issues or PR text
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const text = `${pr.title}\n${pr.body || ''}`.toLowerCase();
+            const keywordMatch = /(perf|performance|benchmark|optimiz|allocation|memory pressure|throughput|latency)/i.test(text);
+            const issueNumbers = new Set();
+
+            for (const match of text.matchAll(/(?:closes|fixes|related to)\s+#(\d+)/gi)) {
+              issueNumbers.add(Number(match[1]));
+            }
+
+            for (const match of text.matchAll(/#(\d+)/g)) {
+              issueNumbers.add(Number(match[1]));
+            }
+
+            let issueMatch = false;
+
+            for (const number of issueNumbers) {
+              const issue = await github.rest.issues.get({ owner, repo, issue_number: number });
+              const labels = issue.data.labels.map(label => label.name);
+
+              if (labels.includes('performance')) {
+                issueMatch = true;
+                break;
+              }
+            }
+
+            if (!keywordMatch && !issueMatch) {
+              core.info('Performance label not applicable for this PR.');
+              return;
+            }
+
+            const currentLabels = pr.labels.map(label => label.name);
+            if (currentLabels.includes('performance')) {
+              core.info('Performance label already present.');
+              return;
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pr.number,
+              labels: ['performance']
+            });
+            core.info('Performance label added.');
