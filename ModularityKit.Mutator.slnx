@@ -1,9 +1,15 @@
 <Solution>
-  <Folder Name="/Polygon/">
-    <Project Path="Polygon/BillingQuotas/BillingQuotas.csproj" />
-    <Project Path="Polygon/FeatureFlags/FeatureFlags.csproj" />
-    <Project Path="Polygon/IamRoles/IamRoles.csproj" />
-    <Project Path="Polygon/WorkflowApprovals/WorkflowApprovals.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/ModularityKit.Mutator.csproj" />
   </Folder>
-  <Project Path="ModularityKit.Mutator/ModularityKit.Mutator.csproj" />
+  <Folder Name="/Examples/">
+    <Project Path="Examples/BillingQuotas/BillingQuotas.csproj" />
+    <Project Path="Examples/FeatureFlags/FeatureFlags.csproj" />
+    <Project Path="Examples/IamRoles/IamRoles.csproj" />
+    <Project Path="Examples/WorkflowApprovals/WorkflowApprovals.csproj" />
+  </Folder>
+  <Folder Name="/Tests/" />
+  <Folder Name="/Benchmarks/">
+    <Project Path="Benchmarks/ModularityKit.Mutator.Benchmarks.csproj" />
+  </Folder>
 </Solution>
