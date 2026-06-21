@@ -1,5 +1,6 @@
 using ModularityKit.Mutator.Abstractions.Changes;
 using ModularityKit.Mutator.Abstractions.Context;
+using ModularityKit.Mutator.Abstractions.Effects;
 using ModularityKit.Mutator.Abstractions.Intent;
 using ModularityKit.Mutator.Abstractions.Policies;
 
@@ -60,6 +61,11 @@ public sealed class MutationAuditEntry
     /// Decisions made by policies during the mutation evaluation.
     /// </summary>
     public IReadOnlyList<PolicyDecision> PolicyDecisions { get; init; } = [];
+
+    /// <summary>
+    /// Side effects produced during the mutation.
+    /// </summary>
+    public IReadOnlyList<SideEffect> SideEffects { get; init; } = [];
 
     /// <summary>
     /// Timestamp when the mutation started.

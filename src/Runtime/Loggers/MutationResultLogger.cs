@@ -38,6 +38,16 @@ public static class MutationResultLogger
             Console.WriteLine($"  ✓ Success, changes: {result.Changes.Count}");
             foreach (var change in result.Changes.Changes)
                 Console.WriteLine($"    - {change.Path}: {change.OldValue} -> {change.NewValue}");
+
+            if (result.SideEffects.Count == 0) continue;
+
+            Console.WriteLine("  Side effects:");
+            foreach (var effect in result.SideEffects)
+            {
+                Console.WriteLine(
+                    $"    - {effect.Type}: {effect.Description} " +
+                    $"(severity={effect.Severity}, requiresAction={effect.RequiresAction})");
+            }
         }
     }
 }

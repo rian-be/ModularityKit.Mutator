@@ -23,6 +23,7 @@ internal static class Program
         
         await Scenarios.HappyPathScenario.Run(engine);
         await Scenarios.RejectedScenario.Run(engine);
+        await Scenarios.SideEffectsScenario.Run(engine);
 
         
         Console.WriteLine("\n METRICS & STATISTICS");

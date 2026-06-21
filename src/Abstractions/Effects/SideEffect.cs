@@ -45,17 +45,25 @@ public sealed class SideEffect
     /// <param name="description">Human-readable description.</param>
     /// <param name="data">Optional associated data.</param>
     /// <param name="severity">Severity level.</param>
+    /// <param name="requiresAction">
+    /// Indicates whether the side effect requires explicit follow-up. Critical severity always implies action.
+    /// </param>
+    /// <param name="timestamp">Optional timestamp override. Defaults to current UTC time.</param>
     public static SideEffect Create(
         string type,
         string description,
         object? data = null,
-        SideEffectSeverity severity = SideEffectSeverity.Info)
+        SideEffectSeverity severity = SideEffectSeverity.Info,
+        bool requiresAction = false,
+        DateTimeOffset? timestamp = null)
         => new()
         {
             Type = type,
             Description = description,
             Data = data,
-            Severity = severity
+            Severity = severity,
+            RequiresAction = requiresAction || severity == SideEffectSeverity.Critical,
+            Timestamp = timestamp ?? DateTimeOffset.UtcNow
         };
 
     /// <summary>
@@ -64,6 +72,17 @@ public sealed class SideEffect
     /// <param name="type">The type of the side effect.</param>
     /// <param name="description">Human-readable description.</param>
     /// <param name="data">Optional associated data.</param>
-    public static SideEffect Critical(string type, string description, object? data = null)
-        => Create(type, description, data, SideEffectSeverity.Critical);
+    /// <param name="timestamp">Optional timestamp override. Defaults to current UTC time.</param>
+    public static SideEffect Critical(
+        string type,
+        string description,
+        object? data = null,
+        DateTimeOffset? timestamp = null)
+        => Create(
+            type,
+            description,
+            data,
+            SideEffectSeverity.Critical,
+            requiresAction: true,
+            timestamp: timestamp);
 }

@@ -18,6 +18,7 @@ The example includes two scenarios:
 
 - a happy path where the steps are approved in sequence
 - a rejection path where one or more approvals are blocked
+- a side effects path where workflow start and rejection emit observable side effects
 
 ## What this example demonstrates
 
@@ -26,6 +27,7 @@ The example includes two scenarios:
 - policy checks that depend on prior state
 - mutation context usage for audit and traceability
 - failure handling when step is out of order or unauthorized
+- side effect emission for monitoring, alerting, and follow-up workflows
 
 ## Project structure
 
@@ -41,6 +43,7 @@ The example includes two scenarios:
 - [`Policies/RequireManagerApprovalPolicy.cs`](Policies/RequireManagerApprovalPolicy.cs)
 - [`Scenarios/HappyPathScenario.cs`](Scenarios/HappyPathScenario.cs)
 - [`Scenarios/RejectedScenario.cs`](Scenarios/RejectedScenario.cs)
+- [`Scenarios/SideEffectsScenario.cs`](Scenarios/SideEffectsScenario.cs)
 
 ## How it works
 
@@ -64,6 +67,7 @@ The sample is intentionally sequential. It shows how stateful process can be adv
 - creates workflow steps from names
 - initializes a new workflow ID
 - emits change entry for the created step list
+- emits a `WorkflowStarted` side effect through `SideEffect.Create(...)`
 
 ### Approve step
 
@@ -81,6 +85,7 @@ The sample is intentionally sequential. It shows how stateful process can be adv
 - applies rejection to every step
 - records the actor who rejected the workflow
 - emits workflow level change
+- emits a critical `WorkflowRejected` side effect through `SideEffect.Critical(...)`
 
 ## Policies
 
@@ -122,6 +127,16 @@ It shows:
 - per step logging
 - final workflow state inspection
 
+### Side effects path
+
+[`SideEffectsScenario`](Scenarios/SideEffectsScenario.cs) starts a workflow and then rejects it to show side effects in the result object.
+
+It shows:
+
+- a standard side effect created with `SideEffect.Create(...)`
+- a critical side effect created with `SideEffect.Critical(...)`
+- how `Severity`, `RequiresAction`, and `Data` can be read from `MutationResult.SideEffects`
+
 ## What to read first
 
 1. [`State/ApprovalWorkflowState.cs`](State/ApprovalWorkflowState.cs)
@@ -131,7 +146,7 @@ It shows:
 5. [`Mutations/ApproveStepMutation.cs`](Mutations/ApproveStepMutation.cs)
 6. [`Policies/EnforceOrderPolicy.cs`](Policies/EnforceOrderPolicy.cs)
 7. [`Policies/RequireManagerApprovalPolicy.cs`](Policies/RequireManagerApprovalPolicy.cs)
-8. [`Scenarios/HappyPathScenario.cs`](Scenarios/HappyPathScenario.cs)
+8. [`Scenarios/SideEffectsScenario.cs`](Scenarios/SideEffectsScenario.cs)
 
 ## Run
 

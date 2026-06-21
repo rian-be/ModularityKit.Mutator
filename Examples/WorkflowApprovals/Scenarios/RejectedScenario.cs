@@ -1,4 +1,5 @@
 using ModularityKit.Mutator.Abstractions.Context;
+using ModularityKit.Mutator.Abstractions.Effects;
 using ModularityKit.Mutator.Abstractions.Engine;
 using WorkflowApprovals.Mutations;
 using WorkflowApprovals.State;
@@ -55,6 +56,7 @@ internal static class RejectedScenario
         state = result.NewState;
 
         var approvers = new[] { "alice", "bob", "carol" };
+        var workflowRejected = false;
 
         for (var i = 0; i < state.Steps.Count; i++)
         {
@@ -73,6 +75,23 @@ internal static class RejectedScenario
                 Console.WriteLine($"✗ Step {i} blocked for {approvers[i]}:");
                 foreach (var dec in res.PolicyDecisions)
                     Console.WriteLine($"  Policy: {dec.PolicyName} – {dec.Reason}");
+
+                var rejectContext = MutationContext.User("security.lead", reason: "Reject blocked workflow");
+                var reject = new RejectWorkflowMutation("security.lead", rejectContext);
+                var rejectResult = await engine.ExecuteAsync(reject, state);
+
+                if (!rejectResult.IsSuccess || rejectResult.NewState == null)
+                {
+                    Console.WriteLine("✗ Failed to reject workflow after policy block.");
+                    break;
+                }
+
+                state = rejectResult.NewState;
+                workflowRejected = true;
+
+                Console.WriteLine("Workflow rejected after policy block.");
+                PrintSideEffects("Reject workflow", rejectResult.SideEffects);
+                break;
             }
         }
 
@@ -81,6 +100,23 @@ internal static class RejectedScenario
         {
             var s = state.Steps[i];
             Console.WriteLine($"  Step{i}: {s.Status} by {(s.ApprovedBy ?? s.RejectedBy ?? "-")}");
+        }
+
+        if (!workflowRejected)
+        {
+            Console.WriteLine("Workflow remained active because no rejection path was triggered.");
+        }
+    }
+
+    private static void PrintSideEffects(string operation, IReadOnlyList<SideEffect> sideEffects)
+    {
+        Console.WriteLine($"{operation} side effects:");
+
+        foreach (var effect in sideEffects)
+        {
+            Console.WriteLine(
+                $"  {effect.Type} | severity={effect.Severity} | requiresAction={effect.RequiresAction}");
+            Console.WriteLine($"    {effect.Description}");
         }
     }
 }
