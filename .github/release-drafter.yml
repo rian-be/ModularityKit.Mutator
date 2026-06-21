@@ -1,0 +1,110 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+tag-prefix: 'v'
+version-template: '$MAJOR.$MINOR.$PATCH'
+draft: true
+prerelease: false
+
+sort-by: merged_at
+sort-direction: descending
+pull-request-limit: 25
+history-limit: 25
+
+no-changes-template: '- No changes.'
+no-contributors-template: 'No contributors.'
+category-template: '## $TITLE'
+change-template: '- [$TITLE]($URL) by @$AUTHOR'
+change-title-escapes: '\<*_&`#@'
+
+exclude-contributors:
+  - github-actions
+  - github-actions[bot]
+  - dependabot
+  - dependabot[bot]
+
+exclude-labels:
+  - skip-changelog
+
+categories:
+  - title: 'Breaking Changes'
+    collapse-after: -1
+    labels:
+      - breaking-change
+
+  - title: 'Enhancements'
+    collapse-after: 10
+    labels:
+      - enhancement
+
+  - title: 'Fixes'
+    collapse-after: 10
+    labels:
+      - bug
+
+  - title: 'Performance'
+    collapse-after: 8
+    labels:
+      - performance
+
+  - title: 'Architecture'
+    collapse-after: 8
+    labels:
+      - architecture
+
+  - title: 'Abstractions'
+    collapse-after: 8
+    labels:
+      - abstractions
+
+  - title: 'Runtime'
+    collapse-after: 8
+    labels:
+      - runtime
+
+  - title: 'Examples'
+    collapse-after: 8
+    labels:
+      - examples
+
+  - title: 'Benchmarks'
+    collapse-after: 8
+    labels:
+      - benchmark
+
+  - title: 'Tests'
+    collapse-after: 8
+    labels:
+      - tests
+
+  - title: 'Documentation'
+    collapse-after: 8
+    labels:
+      - documentation
+
+  - title: 'CI'
+    collapse-after: 8
+    labels:
+      - ci
+
+  - title: 'Other Changes'
+    collapse-after: 8
+
+version-resolver:
+  major:
+    labels:
+      - breaking-change
+  minor:
+    labels:
+      - enhancement
+  patch:
+    labels:
+      - bug
+  default: patch
+
+template: |
+  $CHANGES
+
+footer: |
+  ## Links
+
+  - Full changelog: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
