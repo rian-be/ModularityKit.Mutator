@@ -1,6 +1,7 @@
 using ModularityKit.Mutator.Abstractions.Changes;
 using ModularityKit.Mutator.Abstractions.Context;
 using ModularityKit.Mutator.Abstractions.Engine;
+using ModularityKit.Mutator.Abstractions.Effects;
 using ModularityKit.Mutator.Abstractions.Intent;
 using ModularityKit.Mutator.Abstractions.Results;
 using WorkflowApprovals.State;
@@ -45,7 +46,20 @@ internal sealed record StartApprovalMutation(
         };
 
         var changes = ChangeSet.Single(StateChange.Added("Steps", steps));
-        return MutationResult<ApprovalWorkflowState>.Success(newState, changes);
+        return MutationResult<ApprovalWorkflowState>.Success(
+            newState,
+            changes,
+            [
+                SideEffect.Create(
+                    type: "WorkflowStarted",
+                    description: "Approval workflow started and ready for first review",
+                    data: new
+                    {
+                        Initiator,
+                        StepCount = steps.Count,
+                        WorkflowId = newState.WorkflowId
+                    })
+            ]);
     }
 
     public MutationResult<ApprovalWorkflowState> Simulate(ApprovalWorkflowState state) => Apply(state);
