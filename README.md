@@ -119,6 +119,11 @@ Controls which mutations are allowed.
 - `MutationResult<TState>` – Wraps the new state and change set
 - `ChangeSet` – Captures state modifications
 
+## Package Layout
+
+- `ModularityKit.Mutator` - core mutation runtime, policies, audit, history, and side effects
+- [`ModularityKit.Mutator.Governance`](src/Governance/README.md) - governed mutation request lifecycle, pending execution, and approval-oriented contracts
+
 ---
 ## Metrics & Logging
 
@@ -142,3 +147,7 @@ Key architectural decisions for **ModularityKit.Mutators** are tracked as ADRs. 
 | ADR-005 | Mutation Audit Abstractions | Structured, immutable audit entries capturing intent, context, changes, and policy decisions |
 
 See full ADR documentation in [`Docs/Decision/Adr`](Docs/Decision/listadr) for details on each architectural decision.
+
+## Roadmap
+
+The planned evolution of the engine is documented in [`Docs/Roadmap.md`](Docs/Roadmap.md).
