@@ -1,0 +1,43 @@
+abstractions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/Abstractions/**
+
+runtime:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/Runtime/**
+
+examples:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Examples/**
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Tests/**
+          - '**/*Tests.cs'
+
+benchmark:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Benchmarks/**
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Docs/**
+          - '*.md'
+          - readme.md
+
+architecture:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Docs/Decision/**
+          - .github/config/**
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
