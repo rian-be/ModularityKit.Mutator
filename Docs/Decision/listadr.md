@@ -3,6 +3,10 @@
 This document lists all architectural decisions (ADRs) for **ModularityKit.Mutators**.  
 See each ADR for full rationale, context, and decision details.
 
+## Core
+
+These ADRs describe the base `ModularityKit.Mutator` runtime and its execution model.
+
 | ADR     | Title                                                | Link                                                                                         |
 | ------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | ADR-001 | StateChange and ChangeSet Model                      | [ADR-001](Adr/ADR_001_StateChange_ChangeSet_Model.md)                          |
@@ -23,5 +27,17 @@ See each ADR for full rationale, context, and decision details.
 | ADR-016 | Mutation Metrics Collection                          | [ADR-016](Adr/ADR_016_Mutation_Metrics_Collection.md)                          |
 | ADR-017 | Mutation PolicyRegistry                              | [ADR-017](Adr/ADR_017_Mutation_PolicyRegistry.md)                              |
 | ADR-018 | Mutators DI Registration                             | [ADR-018](Adr/ADR_018_Mutators_DI_Registration.md)                             |
+
+## Governance
+
+These ADRs describe the `ModularityKit.Mutator.Governance` extension layer and its request-based governance model.
+
+| ADR     | Title                                                | Link                                                                                         |
+| ------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| ADR-019 | Governance Package Separation                        | [ADR-019](Adr/ADR_019_Governance_Package_Separation.md)                        |
+| ADR-020 | Governance MutationRequest Model                     | [ADR-020](Adr/ADR_020_Governance_MutationRequest_Model.md)                     |
+| ADR-021 | Governance Pending Mutation Lifecycle                | [ADR-021](Adr/ADR_021_Governance_Pending_Mutation_Lifecycle.md)                |
+| ADR-022 | Governance Request Decisions and Storage             | [ADR-022](Adr/ADR_022_Governance_Request_Decisions_and_Storage.md)             |
+| ADR-023 | Governance Versioned Request Resolution              | [ADR-023](Adr/ADR_023_Governance_Versioned_Request_Resolution.md)              |
 
 > See individual ADRs for detailed context, decision rationale, and consequences.

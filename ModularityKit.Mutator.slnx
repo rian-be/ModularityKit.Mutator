@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/ModularityKit.Mutator.Governance.csproj" />
     <Project Path="src/ModularityKit.Mutator.csproj" />
   </Folder>
   <Folder Name="/Examples/">
