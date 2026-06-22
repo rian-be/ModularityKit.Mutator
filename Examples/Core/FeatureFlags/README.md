@@ -117,7 +117,7 @@ It demonstrates:
 ## Run
 
 ```bash
-dotnet run --project Examples/FeatureFlags/FeatureFlags.csproj
+dotnet run --project Examples/Core/FeatureFlags/FeatureFlags.csproj
 ```
 
 ## Expected output

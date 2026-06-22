@@ -117,7 +117,7 @@ It demonstrates:
 ## Run
 
 ```bash
-dotnet run --project Examples/IamRoles/IamRoles.csproj
+dotnet run --project Examples/Core/IamRoles/IamRoles.csproj
 ```
 
 ## Expected output
