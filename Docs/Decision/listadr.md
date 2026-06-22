@@ -40,5 +40,6 @@ These ADRs describe the `ModularityKit.Mutator.Governance` extension layer and i
 | ADR-022 | Governance Request Decisions and Storage             | [ADR-022](Adr/ADR_022_Governance_Request_Decisions_and_Storage.md)             |
 | ADR-023 | Governance Versioned Request Resolution              | [ADR-023](Adr/ADR_023_Governance_Versioned_Request_Resolution.md)              |
 | ADR-024 | Governance Runtime Pending Request Handling          | [ADR-024](Adr/ADR_024_Governance_Runtime_Pending_Request_Handling.md)          |
+| ADR-025 | Governance Approval Workflow                         | [ADR-025](Adr/ADR_025_Governance_Approval_Workflow.md)                         |
 
 > See individual ADRs for detailed context, decision rationale, and consequences.
