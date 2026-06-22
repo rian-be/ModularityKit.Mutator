@@ -1,4 +1,4 @@
-namespace ModularityKit.Mutator.Governance;
+namespace ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 
 /// <summary>
 /// Describes why a mutation request cannot execute immediately.

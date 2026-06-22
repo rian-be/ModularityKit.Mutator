@@ -4,10 +4,12 @@
     <Project Path="src/ModularityKit.Mutator.csproj" />
   </Folder>
   <Folder Name="/Examples/">
-    <Project Path="Examples/BillingQuotas/BillingQuotas.csproj" />
-    <Project Path="Examples/FeatureFlags/FeatureFlags.csproj" />
-    <Project Path="Examples/IamRoles/IamRoles.csproj" />
-    <Project Path="Examples/WorkflowApprovals/WorkflowApprovals.csproj" />
+    <Project Path="Examples/Core/BillingQuotas/BillingQuotas.csproj" />
+    <Project Path="Examples/Core/FeatureFlags/FeatureFlags.csproj" />
+    <Project Path="Examples/Core/IamRoles/IamRoles.csproj" />
+    <Project Path="Examples/Core/WorkflowApprovals/WorkflowApprovals.csproj" />
+    <Project Path="Examples/Governance/RequestLifecycle/RequestLifecycle.csproj" />
+    <Project Path="Examples/Governance/VersionedResolution/VersionedResolution.csproj" />
   </Folder>
   <Folder Name="/Tests/" />
   <Folder Name="/Benchmarks/">

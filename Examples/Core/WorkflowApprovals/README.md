@@ -151,7 +151,7 @@ It shows:
 ## Run
 
 ```bash
-dotnet run --project Examples/WorkflowApprovals/WorkflowApprovals.csproj
+dotnet run --project Examples/Core/WorkflowApprovals/WorkflowApprovals.csproj
 ```
 
 ## Expected output

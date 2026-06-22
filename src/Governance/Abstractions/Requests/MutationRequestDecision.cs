@@ -1,6 +1,6 @@
 using ModularityKit.Mutator.Abstractions.Context;
 
-namespace ModularityKit.Mutator.Governance;
+namespace ModularityKit.Mutator.Governance.Abstractions.Requests;
 
 /// <summary>
 /// Captures a single decision or lifecycle transition applied to a mutation request.

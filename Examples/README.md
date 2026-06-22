@@ -2,16 +2,28 @@
 
 This folder contains runnable console apps that show how to use `ModularityKit.Mutator` in concrete domain flows.
 
-The examples are intentionally small and focused. Each project demonstrates a different style of mutation workflow, policy enforcement, and engine usage without requiring you to read the whole library first.
+The examples are split into two groups:
 
-## What is here
+- `Core/` for direct mutation engine usage
+- `Governance/` for request lifecycle and governance runtime behavior
+
+The projects are intentionally small and focused. Each one demonstrates a different style of mutation workflow, policy enforcement, and engine usage without requiring you to read the whole library first.
+
+## Examples
 
 | Example | Focus | Readme |
 | --- | --- | --- |
-| `BillingQuotas` | quota changes, validation, and policy limits | [`Examples/BillingQuotas/README.md`](BillingQuotas/README.md) |
-| `FeatureFlags` | feature toggles, audit/history, and batch execution | [`Examples/FeatureFlags/README.md`](FeatureFlags/README.md) |
-| `IamRoles` | role changes, approval rules, and batch migration | [`Examples/IamRoles/README.md`](IamRoles/README.md) |
-| `WorkflowApprovals` | ordered workflow state transitions and approvals | [`Examples/WorkflowApprovals/README.md`](WorkflowApprovals/README.md) |
+| `BillingQuotas` | quota changes, validation, and policy limits | [`Examples/Core/BillingQuotas/README.md`](Core/BillingQuotas/README.md) |
+| `FeatureFlags` | feature toggles, audit/history, and batch execution | [`Examples/Core/FeatureFlags/README.md`](Core/FeatureFlags/README.md) |
+| `IamRoles` | role changes, approval rules, and batch migration | [`Examples/Core/IamRoles/README.md`](Core/IamRoles/README.md) |
+| `WorkflowApprovals` | ordered workflow state transitions and approvals | [`Examples/Core/WorkflowApprovals/README.md`](Core/WorkflowApprovals/README.md) |
+
+## Governance examples
+
+| Example | Focus | Readme |
+| --- | --- | --- |
+| `RequestLifecycle` | pending requests, lifecycle transitions, expiration, and cancellation | [`Examples/Governance/RequestLifecycle/README.md`](Governance/RequestLifecycle/README.md) |
+| `VersionedResolution` | stale request handling and expected state version semantics | [`Examples/Governance/VersionedResolution/README.md`](Governance/VersionedResolution/README.md) |
 
 ## How to use these examples
 
@@ -35,10 +47,12 @@ dotnet build ModularityKit.Mutator.slnx -c Release
 You can also build just one example:
 
 ```bash
-dotnet build Examples/BillingQuotas/BillingQuotas.csproj -c Release
-dotnet build Examples/FeatureFlags/FeatureFlags.csproj -c Release
-dotnet build Examples/IamRoles/IamRoles.csproj -c Release
-dotnet build Examples/WorkflowApprovals/WorkflowApprovals.csproj -c Release
+dotnet build Examples/Core/BillingQuotas/BillingQuotas.csproj -c Release
+dotnet build Examples/Core/FeatureFlags/FeatureFlags.csproj -c Release
+dotnet build Examples/Core/IamRoles/IamRoles.csproj -c Release
+dotnet build Examples/Core/WorkflowApprovals/WorkflowApprovals.csproj -c Release
+dotnet build Examples/Governance/RequestLifecycle/RequestLifecycle.csproj -c Release
+dotnet build Examples/Governance/VersionedResolution/VersionedResolution.csproj -c Release
 ```
 
 ## Run
@@ -48,16 +62,18 @@ Each example is a separate console app.
 From the repository root:
 
 ```bash
-dotnet run --project Examples/BillingQuotas/BillingQuotas.csproj
-dotnet run --project Examples/FeatureFlags/FeatureFlags.csproj
-dotnet run --project Examples/IamRoles/IamRoles.csproj
-dotnet run --project Examples/WorkflowApprovals/WorkflowApprovals.csproj
+dotnet run --project Examples/Core/BillingQuotas/BillingQuotas.csproj
+dotnet run --project Examples/Core/FeatureFlags/FeatureFlags.csproj
+dotnet run --project Examples/Core/IamRoles/IamRoles.csproj
+dotnet run --project Examples/Core/WorkflowApprovals/WorkflowApprovals.csproj
+dotnet run --project Examples/Governance/RequestLifecycle/RequestLifecycle.csproj
+dotnet run --project Examples/Governance/VersionedResolution/VersionedResolution.csproj
 ```
 
 If you want to run one sample repeatedly while changing code, stay in its folder:
 
 ```bash
-cd Examples/BillingQuotas
+cd Examples/Core/BillingQuotas
 dotnet run
 ```
 
@@ -89,30 +105,43 @@ That layout is deliberate. It makes each sample easy to scan and keeps the mutat
 
 Shows quota management workflows such as increasing quotas, applying limits, and resetting values on schedule. It is the simplest place to look if you want a compact example of validation plus policy enforcement.
 
-See [`BillingQuotas/README.md`](BillingQuotas/README.md).
+See [`Core/BillingQuotas/README.md`](Core/BillingQuotas/README.md).
 
 ### FeatureFlags
 
 Shows feature toggle workflows with policy checks and history logging. This example is useful if you want to see how the engine behaves when you care about auditability and batch changes.
 
-See [`FeatureFlags/README.md`](FeatureFlags/README.md).
+See [`Core/FeatureFlags/README.md`](Core/FeatureFlags/README.md).
 
 ### IamRoles
 
 Shows role grant and revoke workflows with approval-style rules. This is the example to read if you care about protection against unsafe privilege changes.
 
-See [`IamRoles/README.md`](IamRoles/README.md).
+See [`Core/IamRoles/README.md`](Core/IamRoles/README.md).
 
 ### WorkflowApprovals
 
 Shows a multi-step approval process with ordered execution and rejection handling. This example is the best fit if you want to study state transitions that must happen in a strict sequence.
 
-See [`WorkflowApprovals/README.md`](WorkflowApprovals/README.md).
+See [`Core/WorkflowApprovals/README.md`](Core/WorkflowApprovals/README.md).
+
+### RequestLifecycle
+
+Shows the governance runtime as a request lifecycle system instead of an immediate execution path. This is the example to read if you want to understand pending requests, approval, cancellation, and expiration.
+
+See [`Governance/RequestLifecycle/README.md`](Governance/RequestLifecycle/README.md).
+
+### VersionedResolution
+
+Shows how governance resolves approved requests once the underlying state version has moved. This is the example to read if you want concrete stale request semantics.
+
+See [`Governance/VersionedResolution/README.md`](Governance/VersionedResolution/README.md).
 
 ## Notes
 
 - The examples are separate console applications, not libraries.
-- They all reference the same mutation engine project under `src/`.
+- Core examples reference the mutation engine under `src/ModularityKit.Mutator.csproj`.
+- Governance examples reference `src/ModularityKit.Mutator.Governance.csproj`.
 - The sample code is meant to be readable and runnable, not minimal for its own sake.
 - Benchmarking lives in [`Benchmarks/`](../Benchmarks/README.md) and is separate from the examples.
 - Tests, when added, should live in [`Tests/`](../Tests/).

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   package:
-    name: Pack library
+    name: Pack packages
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +26,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore src/ModularityKit.Mutator.csproj
+        run: dotnet restore ModularityKit.Mutator.slnx
 
       - name: Resolve package version
         id: version
@@ -44,7 +44,7 @@ jobs:
           fi
           echo "package_version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Pack package
+      - name: Pack core package
         run: >
           dotnet pack src/ModularityKit.Mutator.csproj
           -c Release
@@ -52,8 +52,16 @@ jobs:
           -o nupkg
           -p:PackageVersion=${{ steps.version.outputs.package_version }}
 
-      - name: Upload package
+      - name: Pack governance package
+        run: >
+          dotnet pack src/ModularityKit.Mutator.Governance.csproj
+          -c Release
+          --no-restore
+          -o nupkg
+          -p:PackageVersion=${{ steps.version.outputs.package_version }}
+
+      - name: Upload packages
         uses: actions/upload-artifact@v4
         with:
-          name: ModularityKit.Mutator-nupkg
+          name: ModularityKit-packages
           path: nupkg/*.nupkg

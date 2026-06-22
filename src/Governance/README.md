@@ -10,7 +10,8 @@ The core package stays responsible for direct mutation execution. Governance bui
 - **Pending Lifecycle** - represent requests that cannot execute immediately
 - **Decision History** - record approvals, rejections, cancellations, and other lifecycle transitions
 - **Request Storage Contracts** - define a persistence seam for governance-oriented stores
-- **In-Memory Runtime Support** - provide a lightweight request store for development and tests
+- **Runtime Lifecycle Management** - move requests through pending, approval, expiration, and execution transitions
+- **In-Memory Runtime Support** - provide lightweight request runtime services for development and tests
 
 ## Current Structure
 
@@ -21,6 +22,8 @@ The package defines governance-first abstractions under:
 - `Abstractions/Requests`
 - `Abstractions/Lifecycle`
 - `Abstractions/Storage`
+- `Abstractions/Resolution`
+- `Abstractions/Exceptions`
 
 Key types:
 
@@ -30,12 +33,21 @@ Key types:
 - `MutationRequestStatus`
 - `PendingMutationReason`
 - `IMutationRequestStore`
+- `IMutationRequestLifecycleManager`
+- `IMutationRequestVersionResolver`
+- `MutationRequestVersionResolution`
+- `MutationRequestVersionResolutionOutcome`
+- `VersionedRequestResolutionStrategy`
+- `MutationRequestNotFoundException`
+- `InvalidMutationRequestTransitionException`
 
 ### Runtime
 
 The initial runtime layer currently provides:
 
-- `InMemoryMutationRequestStore`
+- `Runtime/Storage/InMemoryMutationRequestStore`
+- `Runtime/Lifecycle/MutationRequestLifecycleManager`
+- `Runtime/Resolution/MutationRequestVersionResolver`
 
 This keeps the first version small while leaving room for later persistence providers such as Entity Framework Core or PostgreSQL-backed governance stores.
 

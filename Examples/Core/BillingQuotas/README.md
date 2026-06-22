@@ -138,7 +138,7 @@ It shows:
 ## Run
 
 ```bash
-dotnet run --project Examples/BillingQuotas/BillingQuotas.csproj
+dotnet run --project Examples/Core/BillingQuotas/BillingQuotas.csproj
 ```
 
 ## Expected output
@@ -152,4 +152,3 @@ The sample prints:
 - aggregate engine statistics
 
 The exact numbers depend on the runtime and any policy thresholds you change.
-

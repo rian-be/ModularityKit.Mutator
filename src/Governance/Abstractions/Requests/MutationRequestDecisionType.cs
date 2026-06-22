@@ -1,4 +1,4 @@
-namespace ModularityKit.Mutator.Governance;
+namespace ModularityKit.Mutator.Governance.Abstractions.Requests;
 
 /// <summary>
 /// Represents a governance decision taken against a mutation request.
@@ -6,10 +6,15 @@ namespace ModularityKit.Mutator.Governance;
 public enum MutationRequestDecisionType
 {
     Submitted = 0,
-    Approved = 1,
-    Rejected = 2,
-    Canceled = 3,
-    Expired = 4,
-    Superseded = 5,
-    Executed = 6
+    Pending = 1,
+    Approved = 2,
+    Rejected = 3,
+    Canceled = 4,
+    Expired = 5,
+    Superseded = 6,
+    Executed = 7,
+    VersionValidated = 8,
+    RevalidationRequired = 9,
+    RenewedApprovalRequired = 10,
+    RejectedAsStale = 11
 }

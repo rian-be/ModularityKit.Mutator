@@ -1,4 +1,4 @@
-namespace ModularityKit.Mutator.Governance;
+namespace ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 
 /// <summary>
 /// Represents the lifecycle status of governed mutation request.
