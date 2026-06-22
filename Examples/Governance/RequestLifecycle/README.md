@@ -21,7 +21,7 @@ It focuses on `MutationRequest`, `IMutationRequestStore`, and `MutationRequestLi
 
 - [`Program.cs`](Program.cs)
 - [`Scenarios/GovernanceRequestLifecycleScenario.cs`](Scenarios/GovernanceRequestLifecycleScenario.cs)
-- [`src/Governance/Abstractions/Requests/MutationRequest.cs`](../../../src/Governance/Abstractions/Requests/MutationRequest.cs)
+- [`src/Governance/Abstractions/Requests/Model/MutationRequest.cs`](../../../src/Governance/Abstractions/Requests/Model/MutationRequest.cs)
 - [`src/Governance/Abstractions/Lifecycle/IMutationRequestLifecycleManager.cs`](../../../src/Governance/Abstractions/Lifecycle/IMutationRequestLifecycleManager.cs)
 - [`src/Governance/Runtime/MutationRequestLifecycleManager.cs`](../../../src/Governance/Runtime/MutationRequestLifecycleManager.cs)
 - [`src/Governance/Runtime/InMemoryMutationRequestStore.cs`](../../../src/Governance/Runtime/InMemoryMutationRequestStore.cs)
