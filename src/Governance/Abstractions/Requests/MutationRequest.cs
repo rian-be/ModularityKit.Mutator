@@ -61,6 +61,11 @@ public sealed record MutationRequest
     public IReadOnlyList<MutationRequestDecision> Decisions { get; init; } = [];
 
     /// <summary>
+    /// Optimistic concurrency revision for the governed request.
+    /// </summary>
+    public long Revision { get; init; }
+
+    /// <summary>
     /// Expected version or concurrency token for the target state.
     /// </summary>
     public string? ExpectedStateVersion { get; init; }

@@ -1,4 +1,5 @@
 using ModularityKit.Mutator.Abstractions.Context;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
 using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 using ModularityKit.Mutator.Governance.Abstractions.Requests;
 using ModularityKit.Mutator.Governance.Runtime.Storage;
@@ -10,32 +11,61 @@ namespace ModularityKit.Mutator.Governance.Tests.Lifecycle;
 public sealed class MutationRequestStoreContractTests
 {
     [Fact]
-    public async Task Store_contract_allows_blind_overwrite_without_expected_revision_or_status()
+    public async Task Create_contract_rejects_duplicate_request_ids()
     {
         var store = new InMemoryMutationRequestStore();
         var request = MutationRequestTestFactory.CreatePendingRequest();
 
-        await store.Store(request);
+        var created = await store.Create(request);
 
-        var overwritten = request with
+        var exception = await Assert.ThrowsAsync<MutationRequestAlreadyExistsException>(() =>
+            store.Create(created));
+
+        Assert.Equal(request.RequestId, exception.RequestId);
+    }
+
+    [Fact]
+    public async Task TryStore_rejects_stale_revision_and_preserves_current_state()
+    {
+        var store = new InMemoryMutationRequestStore();
+        var request = MutationRequestTestFactory.CreatePendingRequest();
+        var created = await store.Create(request);
+
+        var firstUpdate = created with
+        {
+            Status = MutationRequestStatus.Approved,
+            PendingReason = null,
+            Decisions =
+            [
+                .. created.Decisions,
+                MutationRequestDecision.Create(
+                    MutationRequestDecisionType.Approved,
+                    MutationContext.User("approver", "Approver", "Approve request"))
+            ]
+        };
+
+        var persisted = await store.TryStore(firstUpdate, created.Revision);
+        Assert.NotNull(persisted);
+
+        var staleUpdate = created with
         {
             Status = MutationRequestStatus.Canceled,
             PendingReason = null,
             Decisions =
             [
-                .. request.Decisions,
+                .. created.Decisions,
                 MutationRequestDecision.Create(
                     MutationRequestDecisionType.Canceled,
-                    MutationContext.User("operator", "Operator", "Canceled without guard"))
+                    MutationContext.User("operator", "Operator", "Cancel request"))
             ]
         };
 
-        await store.Store(overwritten);
-
+        var rejected = await store.TryStore(staleUpdate, created.Revision);
         var loaded = await store.Get(request.RequestId);
 
+        Assert.Null(rejected);
         Assert.NotNull(loaded);
-        Assert.Equal(MutationRequestStatus.Canceled, loaded.Status);
-        Assert.Equal(overwritten.Decisions.Count, loaded.Decisions.Count);
+        Assert.Equal(MutationRequestStatus.Approved, loaded.Status);
+        Assert.Equal(1, loaded.Revision);
     }
 }

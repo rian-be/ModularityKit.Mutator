@@ -1,5 +1,4 @@
 using ModularityKit.Mutator.Abstractions.Context;
-using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
 using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 using ModularityKit.Mutator.Governance.Abstractions.Requests;
 using ModularityKit.Mutator.Governance.Abstractions.Storage;
@@ -12,6 +11,7 @@ namespace ModularityKit.Mutator.Governance.Runtime.Lifecycle;
 public sealed class MutationRequestLifecycleManager(IMutationRequestStore requestStore) : IMutationRequestLifecycleManager
 {
     private readonly IMutationRequestStore _requestStore = requestStore ?? throw new ArgumentNullException(nameof(requestStore));
+    private readonly MutationRequestTransitionExecutor _transitionExecutor = new(requestStore);
 
     public async Task<MutationRequest> Submit(
         MutationRequest request,
@@ -19,8 +19,7 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        await _requestStore.Store(request, cancellationToken).ConfigureAwait(false);
-        return request;
+        return await _requestStore.Create(request, cancellationToken).ConfigureAwait(false);
     }
 
     public Task<MutationRequest> MoveToPending(
@@ -32,7 +31,7 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         IReadOnlyDictionary<string, object>? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Pending,
             MutationRequestDecisionType.Pending,
@@ -54,7 +53,7 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         IReadOnlyDictionary<string, object>? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Approved,
             MutationRequestDecisionType.Approved,
@@ -75,13 +74,13 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         IReadOnlyDictionary<string, object>? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Rejected,
             MutationRequestDecisionType.Rejected,
             decisionContext,
             reason,
-            ClearPendingState,
+            MutationRequestLifecycleState.ClearPendingState,
             metadata,
             cancellationToken);
     }
@@ -93,13 +92,13 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         IReadOnlyDictionary<string, object>? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Canceled,
             MutationRequestDecisionType.Canceled,
             decisionContext,
             reason,
-            ClearPendingState,
+            MutationRequestLifecycleState.ClearPendingState,
             metadata,
             cancellationToken);
     }
@@ -111,13 +110,13 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         IReadOnlyDictionary<string, object>? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Expired,
             MutationRequestDecisionType.Expired,
             decisionContext,
             reason,
-            ClearPendingState,
+            MutationRequestLifecycleState.ClearPendingState,
             metadata,
             cancellationToken);
     }
@@ -163,20 +162,20 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         if (string.IsNullOrWhiteSpace(supersedingRequestId))
             throw new ArgumentException("Superseding request ID is required.", nameof(supersedingRequestId));
 
-        var transitionMetadata = MergeMetadata(
+        var transitionMetadata = MutationRequestLifecycleState.MergeMetadata(
             metadata,
             new Dictionary<string, object>
             {
                 ["SupersedingRequestId"] = supersedingRequestId
             });
 
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Superseded,
             MutationRequestDecisionType.Superseded,
             decisionContext,
             reason ?? $"Superseded by request '{supersedingRequestId}'.",
-            ClearPendingState,
+            MutationRequestLifecycleState.ClearPendingState,
             transitionMetadata,
             cancellationToken);
     }
@@ -188,13 +187,13 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         IReadOnlyDictionary<string, object>? metadata = null,
         CancellationToken cancellationToken = default)
     {
-        return Transition(
+        return _transitionExecutor.Execute(
             requestId,
             MutationRequestStatus.Executed,
             MutationRequestDecisionType.Executed,
             decisionContext,
             reason,
-            ClearPendingState,
+            MutationRequestLifecycleState.ClearPendingState,
             metadata,
             cancellationToken);
     }
@@ -214,122 +213,4 @@ public sealed class MutationRequestLifecycleManager(IMutationRequestStore reques
         return _requestStore.GetPendingByStateId(stateId, reason, cancellationToken);
     }
 
-    private async Task<MutationRequest> Transition(
-        string requestId,
-        MutationRequestStatus targetStatus,
-        MutationRequestDecisionType decisionType,
-        MutationContext decisionContext,
-        string? reason,
-        Func<MutationRequest, MutationRequest> applyState,
-        IReadOnlyDictionary<string, object>? metadata,
-        CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrWhiteSpace(requestId))
-            throw new ArgumentException("Request ID is required.", nameof(requestId));
-
-        ArgumentNullException.ThrowIfNull(decisionContext);
-        ArgumentNullException.ThrowIfNull(applyState);
-
-        var request = await GetRequired(requestId, cancellationToken).ConfigureAwait(false);
-
-        ValidateTransition(request.Status, targetStatus, request.RequestId);
-
-        var decision = MutationRequestDecision.Create(
-            decisionType,
-            decisionContext,
-            reason,
-            metadata);
-
-        var updatedRequest = applyState(request) with
-        {
-            Status = targetStatus,
-            UpdatedAt = decision.Timestamp,
-            Decisions = [.. request.Decisions, decision]
-        };
-
-        await _requestStore.Store(updatedRequest, cancellationToken).ConfigureAwait(false);
-        return updatedRequest;
-    }
-
-    private async Task<MutationRequest> GetRequired(
-        string requestId,
-        CancellationToken cancellationToken)
-    {
-        var request = await _requestStore.Get(requestId, cancellationToken).ConfigureAwait(false);
-
-        if (request is null)
-            throw new MutationRequestNotFoundException(requestId);
-
-        return request;
-    }
-
-    private static void ValidateTransition(
-        MutationRequestStatus currentStatus,
-        MutationRequestStatus targetStatus,
-        string requestId)
-    {
-        if (currentStatus == targetStatus)
-            throw new InvalidMutationRequestTransitionException(requestId, currentStatus, targetStatus);
-
-        var isValid = currentStatus switch
-        {
-            MutationRequestStatus.Created => targetStatus is
-                MutationRequestStatus.Pending or
-                MutationRequestStatus.Approved or
-                MutationRequestStatus.Canceled or
-                MutationRequestStatus.Superseded,
-            MutationRequestStatus.Pending => targetStatus is
-                MutationRequestStatus.Approved or
-                MutationRequestStatus.Rejected or
-                MutationRequestStatus.Canceled or
-                MutationRequestStatus.Expired or
-                MutationRequestStatus.Superseded,
-            MutationRequestStatus.Approved => targetStatus is
-                MutationRequestStatus.Pending or
-                MutationRequestStatus.Rejected or
-                MutationRequestStatus.Canceled or
-                MutationRequestStatus.Superseded or
-                MutationRequestStatus.Executed,
-            MutationRequestStatus.Rejected => false,
-            MutationRequestStatus.Canceled => false,
-            MutationRequestStatus.Expired => false,
-            MutationRequestStatus.Superseded => false,
-            MutationRequestStatus.Executed => false,
-            _ => false
-        };
-
-        if (!isValid)
-            throw new InvalidMutationRequestTransitionException(requestId, currentStatus, targetStatus);
-    }
-
-    private static MutationRequest ClearPendingState(MutationRequest request)
-    {
-        return request with
-        {
-            PendingReason = null,
-            ExpiresAt = null
-        };
-    }
-
-    private static IReadOnlyDictionary<string, object> MergeMetadata(
-        IReadOnlyDictionary<string, object>? metadata,
-        IReadOnlyDictionary<string, object> appended)
-    {
-        var merged = new Dictionary<string, object>();
-
-        if (metadata is not null)
-        {
-            foreach (var pair in metadata)
-            {
-                merged[pair.Key] = pair.Value;
-            }
-        }
-
-        foreach (var pair in appended)
-        {
-            merged[pair.Key] = pair.Value;
-        }
-
-        return merged;
-    }
 }

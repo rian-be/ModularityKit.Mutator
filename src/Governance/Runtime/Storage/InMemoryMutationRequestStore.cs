@@ -1,6 +1,7 @@
 using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 using ModularityKit.Mutator.Governance.Abstractions.Requests;
 using ModularityKit.Mutator.Governance.Abstractions.Storage;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
 
 namespace ModularityKit.Mutator.Governance.Runtime.Storage;
 
@@ -13,7 +14,7 @@ public sealed class InMemoryMutationRequestStore : IMutationRequestStore
     private readonly Dictionary<string, MutationRequest> _requests = new();
     private readonly Lock _lock = new();
 
-    public Task Store(
+    public Task<MutationRequest> Create(
         MutationRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -21,10 +22,42 @@ public sealed class InMemoryMutationRequestStore : IMutationRequestStore
 
         lock (_lock)
         {
-            _requests[request.RequestId] = request;
-        }
+            if (_requests.ContainsKey(request.RequestId))
+                throw new MutationRequestAlreadyExistsException(request.RequestId);
 
-        return Task.CompletedTask;
+            var persistedRequest = request with
+            {
+                Revision = 0
+            };
+
+            _requests[request.RequestId] = persistedRequest;
+            return Task.FromResult(persistedRequest);
+        }
+    }
+
+    public Task<MutationRequest?> TryStore(
+        MutationRequest request,
+        long expectedRevision,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        lock (_lock)
+        {
+            if (!_requests.TryGetValue(request.RequestId, out var currentRequest))
+                return Task.FromResult<MutationRequest?>(null);
+
+            if (currentRequest.Revision != expectedRevision)
+                return Task.FromResult<MutationRequest?>(null);
+
+            var persistedRequest = request with
+            {
+                Revision = expectedRevision + 1
+            };
+
+            _requests[request.RequestId] = persistedRequest;
+            return Task.FromResult<MutationRequest?>(persistedRequest);
+        }
     }
 
     public Task<MutationRequest?> Get(
