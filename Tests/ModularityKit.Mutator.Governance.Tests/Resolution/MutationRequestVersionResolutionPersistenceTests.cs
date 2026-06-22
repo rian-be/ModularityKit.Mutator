@@ -1,9 +1,10 @@
 using ModularityKit.Mutator.Abstractions.Context;
-using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
-using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
-using ModularityKit.Mutator.Governance.Abstractions.Requests;
-using ModularityKit.Mutator.Governance.Abstractions.Resolution;
-using ModularityKit.Mutator.Governance.Runtime.Resolution;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions.Storage;
+using ModularityKit.Mutator.Governance.Abstractions.Lifecycle.Model;
+using ModularityKit.Mutator.Governance.Abstractions.Requests.Decisions;
+using ModularityKit.Mutator.Governance.Abstractions.Requests.Model;
+using ModularityKit.Mutator.Governance.Abstractions.Resolution.Strategies;
+using ModularityKit.Mutator.Governance.Runtime.Resolution.Execution;
 using ModularityKit.Mutator.Governance.Runtime.Storage;
 using ModularityKit.Mutator.Governance.Tests.TestSupport;
 using Xunit;
@@ -54,7 +55,9 @@ public sealed class MutationRequestVersionResolutionPersistenceTests
 
         Assert.NotNull(loaded);
         Assert.Equal(3, loaded.Decisions.Count);
-        Assert.Equal(MutationRequestDecisionType.RejectedAsStale, loaded.Decisions[^1].Type);
+        Assert.Equal(
+            MutationRequestDecisionType.VersionResolution(MutationRequestVersionResolutionDecisionType.RejectedAsStale),
+            loaded.Decisions[^1].Type);
         Assert.Equal(MutationRequestStatus.Rejected, loaded.Status);
         Assert.Equal(1, loaded.Revision);
         Assert.Equal(loaded, resolution.Request);

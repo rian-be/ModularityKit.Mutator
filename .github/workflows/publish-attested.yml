@@ -2,6 +2,11 @@ name: Publish Attested
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the leading "v"
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -12,6 +17,8 @@ permissions:
 jobs:
   publish:
     uses: ./.github/workflows/publish-artifacts.yml
+    with:
+      package_version: ${{ inputs.version }}
 
   release:
     name: Upload artifacts to draft release

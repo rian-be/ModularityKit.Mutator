@@ -9,6 +9,7 @@ The core package stays responsible for direct mutation execution. Governance bui
 - **Mutation Requests** - model governed mutation submission as a durable request
 - **Pending Lifecycle** - represent requests that cannot execute immediately
 - **Decision History** - record approvals, rejections, cancellations, and other lifecycle transitions
+- **Approval Workflow** - model request-level approval requirements and explicit approver actions
 - **Request Storage Contracts** - define a persistence seam for governance-oriented stores
 - **Runtime Lifecycle Management** - move requests through pending, approval, expiration, and execution transitions
 - **In-Memory Runtime Support** - provide lightweight request runtime services for development and tests
@@ -20,6 +21,7 @@ The core package stays responsible for direct mutation execution. Governance bui
 The package defines governance-first abstractions under:
 
 - `Abstractions/Requests`
+- `Abstractions/Approval`
 - `Abstractions/Lifecycle`
 - `Abstractions/Storage`
 - `Abstractions/Resolution`
@@ -28,11 +30,18 @@ The package defines governance-first abstractions under:
 Key types:
 
 - `MutationRequest`
+- `MutationApprovalRequirement`
+- `MutationApprovalRequirementStatus`
 - `MutationRequestDecision`
 - `MutationRequestDecisionType`
+- `MutationRequestDecisionCategory`
+- `MutationRequestLifecycleDecisionType`
+- `MutationRequestApprovalDecisionType`
+- `MutationRequestVersionResolutionDecisionType`
 - `MutationRequestStatus`
 - `PendingMutationReason`
 - `IMutationRequestStore`
+- `IMutationRequestApprovalWorkflowManager`
 - `IMutationRequestLifecycleManager`
 - `IMutationRequestVersionResolver`
 - `IMutationRequestVersionResolutionManager`
@@ -40,18 +49,65 @@ Key types:
 - `MutationRequestVersionResolutionOutcome`
 - `VersionedRequestResolutionStrategy`
 - `MutationRequestAlreadyExistsException`
+- `MutationApprovalRequirementNotFoundException`
+- `InvalidMutationApprovalActionException`
 - `MutationRequestConcurrencyException`
 - `MutationRequestNotFoundException`
 - `InvalidMutationRequestTransitionException`
+
+`Abstractions/Requests` is further split into:
+
+- `Requests/Model`
+- `Requests/Decisions`
+
+`Abstractions/Approval` is further split into:
+
+- `Approval/Contracts`
+- `Approval/Model`
+- `Approval/Mapping`
+
+`Abstractions/Resolution` is further split into:
+
+- `Resolution/Contracts`
+- `Resolution/Model`
+- `Resolution/Strategies`
+
+`Abstractions/Lifecycle` is further split into:
+
+- `Lifecycle/Contracts`
+- `Lifecycle/Model`
+
+`Abstractions/Exceptions` is further split into:
+
+- `Exceptions/Approval`
+- `Exceptions/Lifecycle`
+- `Exceptions/Storage`
 
 ### Runtime
 
 The initial runtime layer currently provides:
 
 - `Runtime/Storage/InMemoryMutationRequestStore`
+- `Runtime/Approval/MutationRequestApprovalWorkflowManager`
 - `Runtime/Lifecycle/MutationRequestLifecycleManager`
 - `Runtime/Resolution/MutationRequestVersionResolver`
 - `Runtime/Resolution/MutationRequestVersionResolutionManager`
+
+`Runtime/Resolution` is further split into:
+
+- `Resolution/Evaluation`
+- `Resolution/Execution`
+
+`Runtime/Lifecycle` is further split into:
+
+- `Lifecycle/Execution`
+- `Lifecycle/Validation`
+- `Lifecycle/State`
+
+`Runtime/Approval` is further split into:
+
+- `Approval/Execution`
+- `Approval/State`
 
 This keeps the first version small while leaving room for later persistence providers such as Entity Framework Core or PostgreSQL-backed governance stores.
 

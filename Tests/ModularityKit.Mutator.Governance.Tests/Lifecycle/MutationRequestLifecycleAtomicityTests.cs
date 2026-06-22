@@ -1,7 +1,7 @@
 using ModularityKit.Mutator.Abstractions.Context;
-using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
-using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
-using ModularityKit.Mutator.Governance.Runtime.Lifecycle;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions.Storage;
+using ModularityKit.Mutator.Governance.Abstractions.Lifecycle.Model;
+using ModularityKit.Mutator.Governance.Runtime.Lifecycle.Execution;
 using ModularityKit.Mutator.Governance.Tests.TestSupport;
 using Xunit;
 

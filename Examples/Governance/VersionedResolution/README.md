@@ -17,10 +17,10 @@ It is the direct runnable example for the semantics introduced around `ExpectedS
 
 - [`Program.cs`](Program.cs)
 - [`Scenarios/GovernanceVersionedResolutionScenario.cs`](Scenarios/GovernanceVersionedResolutionScenario.cs)
-- [`src/Governance/Runtime/Resolution/MutationRequestVersionResolver.cs`](../../../src/Governance/Runtime/Resolution/MutationRequestVersionResolver.cs)
-- [`src/Governance/Runtime/Resolution/MutationRequestVersionResolutionManager.cs`](../../../src/Governance/Runtime/Resolution/MutationRequestVersionResolutionManager.cs)
-- [`src/Governance/Abstractions/Resolution/VersionedRequestResolutionStrategy.cs`](../../../src/Governance/Abstractions/Resolution/VersionedRequestResolutionStrategy.cs)
-- [`src/Governance/Abstractions/Resolution/MutationRequestVersionResolution.cs`](../../../src/Governance/Abstractions/Resolution/MutationRequestVersionResolution.cs)
+- [`src/Governance/Runtime/Resolution/Execution/MutationRequestVersionResolver.cs`](../../../src/Governance/Runtime/Resolution/Execution/MutationRequestVersionResolver.cs)
+- [`src/Governance/Runtime/Resolution/Execution/MutationRequestVersionResolutionManager.cs`](../../../src/Governance/Runtime/Resolution/Execution/MutationRequestVersionResolutionManager.cs)
+- [`src/Governance/Abstractions/Resolution/Strategies/VersionedRequestResolutionStrategy.cs`](../../../src/Governance/Abstractions/Resolution/Strategies/VersionedRequestResolutionStrategy.cs)
+- [`src/Governance/Abstractions/Resolution/Model/MutationRequestVersionResolution.cs`](../../../src/Governance/Abstractions/Resolution/Model/MutationRequestVersionResolution.cs)
 
 ## Run
 

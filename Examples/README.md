@@ -23,6 +23,8 @@ The projects are intentionally small and focused. Each one demonstrates a differ
 | Example | Focus | Readme |
 | --- | --- | --- |
 | `RequestLifecycle` | pending requests, lifecycle transitions, expiration, and cancellation | [`Examples/Governance/RequestLifecycle/README.md`](Governance/RequestLifecycle/README.md) |
+| `DecisionTaxonomy` | lifecycle, approval, and version-resolution decision categories | [`Examples/Governance/DecisionTaxonomy/README.md`](Governance/DecisionTaxonomy/README.md) |
+| `ApprovalWorkflow` | request-level approvals, multi-step sign-off, and governed approval actions | [`Examples/Governance/ApprovalWorkflow/README.md`](Governance/ApprovalWorkflow/README.md) |
 | `VersionedResolution` | stale request handling and expected state version semantics | [`Examples/Governance/VersionedResolution/README.md`](Governance/VersionedResolution/README.md) |
 
 ## How to use these examples
@@ -52,6 +54,8 @@ dotnet build Examples/Core/FeatureFlags/FeatureFlags.csproj -c Release
 dotnet build Examples/Core/IamRoles/IamRoles.csproj -c Release
 dotnet build Examples/Core/WorkflowApprovals/WorkflowApprovals.csproj -c Release
 dotnet build Examples/Governance/RequestLifecycle/RequestLifecycle.csproj -c Release
+dotnet build Examples/Governance/DecisionTaxonomy/DecisionTaxonomy.csproj -c Release
+dotnet build Examples/Governance/ApprovalWorkflow/ApprovalWorkflow.csproj -c Release
 dotnet build Examples/Governance/VersionedResolution/VersionedResolution.csproj -c Release
 ```
 
@@ -67,6 +71,8 @@ dotnet run --project Examples/Core/FeatureFlags/FeatureFlags.csproj
 dotnet run --project Examples/Core/IamRoles/IamRoles.csproj
 dotnet run --project Examples/Core/WorkflowApprovals/WorkflowApprovals.csproj
 dotnet run --project Examples/Governance/RequestLifecycle/RequestLifecycle.csproj
+dotnet run --project Examples/Governance/DecisionTaxonomy/DecisionTaxonomy.csproj
+dotnet run --project Examples/Governance/ApprovalWorkflow/ApprovalWorkflow.csproj
 dotnet run --project Examples/Governance/VersionedResolution/VersionedResolution.csproj
 ```
 
@@ -130,6 +136,18 @@ See [`Core/WorkflowApprovals/README.md`](Core/WorkflowApprovals/README.md).
 Shows the governance runtime as a request lifecycle system instead of an immediate execution path. This is the example to read if you want to understand pending requests, approval, cancellation, and expiration.
 
 See [`Governance/RequestLifecycle/README.md`](Governance/RequestLifecycle/README.md).
+
+### ApprovalWorkflow
+
+Shows how governance turns approval requirements into explicit request-level approval actions with ordered steps and terminal approval or rejection behavior.
+
+See [`Governance/ApprovalWorkflow/README.md`](Governance/ApprovalWorkflow/README.md).
+
+### DecisionTaxonomy
+
+Shows why governance request decisions are split into lifecycle, approval, and version-resolution categories instead of being kept in one flat enum.
+
+See [`Governance/DecisionTaxonomy/README.md`](Governance/DecisionTaxonomy/README.md).
 
 ### VersionedResolution
 

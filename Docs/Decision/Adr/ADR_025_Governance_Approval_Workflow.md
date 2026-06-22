@@ -4,7 +4,7 @@
 #adr_025
 
 ## Status
-Proposed
+Accepted
 
 ## Date
 2026-06-22

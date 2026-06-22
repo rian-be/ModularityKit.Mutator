@@ -37,6 +37,8 @@ jobs:
   publish:
     needs: update-release-draft
     uses: ./.github/workflows/publish-artifacts.yml
+    with:
+      package_version: ${{ needs.update-release-draft.outputs.tag_name }}
 
   upload-release-assets:
     name: Upload artifacts to release draft

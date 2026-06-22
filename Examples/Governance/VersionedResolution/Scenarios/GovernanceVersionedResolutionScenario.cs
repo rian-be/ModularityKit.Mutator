@@ -1,8 +1,9 @@
 using ModularityKit.Mutator.Abstractions.Context;
 using ModularityKit.Mutator.Abstractions.Intent;
-using ModularityKit.Mutator.Governance.Abstractions.Requests;
-using ModularityKit.Mutator.Governance.Abstractions.Resolution;
-using ModularityKit.Mutator.Governance.Runtime.Resolution;
+using ModularityKit.Mutator.Governance.Abstractions.Requests.Model;
+using ModularityKit.Mutator.Governance.Abstractions.Resolution.Model;
+using ModularityKit.Mutator.Governance.Abstractions.Resolution.Strategies;
+using ModularityKit.Mutator.Governance.Runtime.Resolution.Execution;
 using ModularityKit.Mutator.Governance.Runtime.Storage;
 
 namespace VersionedResolution.Scenarios;
