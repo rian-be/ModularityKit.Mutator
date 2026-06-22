@@ -38,6 +38,8 @@ Key types:
 - `MutationRequestVersionResolution`
 - `MutationRequestVersionResolutionOutcome`
 - `VersionedRequestResolutionStrategy`
+- `MutationRequestAlreadyExistsException`
+- `MutationRequestConcurrencyException`
 - `MutationRequestNotFoundException`
 - `InvalidMutationRequestTransitionException`
 

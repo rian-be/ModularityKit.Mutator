@@ -17,7 +17,7 @@ public sealed class MutationRequestVersionResolutionPersistenceTests
         var resolver = new MutationRequestVersionResolver();
         var request = MutationRequestTestFactory.CreateApprovedSecurityRequest("v10");
 
-        await store.Store(request);
+        await store.Create(request);
 
         var resolution = resolver.Resolve(
             request,

@@ -9,10 +9,19 @@ namespace ModularityKit.Mutator.Governance.Abstractions.Storage;
 public interface IMutationRequestStore
 {
     /// <summary>
-    /// Stores or updates a mutation request.
+    /// Creates a new governed mutation request in persistence.
     /// </summary>
-    Task Store(
+    Task<MutationRequest> Create(
         MutationRequest request,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Stores a request only when the persisted revision matches the expected revision.
+    /// Returns the persisted request with incremented revision on success, or <c>null</c> on conflict.
+    /// </summary>
+    Task<MutationRequest?> TryStore(
+        MutationRequest request,
+        long expectedRevision,
         CancellationToken cancellationToken = default);
 
     /// <summary>

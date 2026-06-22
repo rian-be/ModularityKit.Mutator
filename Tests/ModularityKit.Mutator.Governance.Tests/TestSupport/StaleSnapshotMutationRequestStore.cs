@@ -26,17 +26,40 @@ internal sealed class StaleSnapshotMutationRequestStore(MutationRequest seedRequ
 
     public IReadOnlyList<MutationRequest> GetSnapshots => _getSnapshots;
 
-    public Task Store(
+    public Task<MutationRequest> Create(
         MutationRequest request,
         CancellationToken cancellationToken = default)
     {
         lock (_gate)
         {
             StoreCount++;
-            _current = request;
+            _current = request with
+            {
+                Revision = 0
+            };
         }
 
-        return Task.CompletedTask;
+        return Task.FromResult(_current);
+    }
+
+    public Task<MutationRequest?> TryStore(
+        MutationRequest request,
+        long expectedRevision,
+        CancellationToken cancellationToken = default)
+    {
+        lock (_gate)
+        {
+            if (_current.Revision != expectedRevision)
+                return Task.FromResult<MutationRequest?>(null);
+
+            StoreCount++;
+            _current = request with
+            {
+                Revision = expectedRevision + 1
+            };
+
+            return Task.FromResult<MutationRequest?>(_current);
+        }
     }
 
     public Task<MutationRequest?> Get(

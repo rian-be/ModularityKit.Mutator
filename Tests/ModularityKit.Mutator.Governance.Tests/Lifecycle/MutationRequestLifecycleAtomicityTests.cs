@@ -1,4 +1,5 @@
 using ModularityKit.Mutator.Abstractions.Context;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
 using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 using ModularityKit.Mutator.Governance.Runtime.Lifecycle;
 using ModularityKit.Mutator.Governance.Tests.TestSupport;
@@ -9,7 +10,7 @@ namespace ModularityKit.Mutator.Governance.Tests.Lifecycle;
 public sealed class MutationRequestLifecycleAtomicityTests
 {
     [Fact]
-    public async Task Stale_snapshot_transition_can_succeed_after_a_prior_lifecycle_update()
+    public async Task Stale_snapshot_transition_is_rejected_after_a_prior_lifecycle_update()
     {
         var request = MutationRequestTestFactory.CreatePendingRequest();
         var store = new StaleSnapshotMutationRequestStore(request);
@@ -19,15 +20,17 @@ public sealed class MutationRequestLifecycleAtomicityTests
             request.RequestId,
             MutationContext.User("approver", "Approver", "Approve request"));
 
-        var canceled = await manager.Cancel(
-            request.RequestId,
-            MutationContext.User("operator", "Operator", "Cancel request"));
+        var exception = await Assert.ThrowsAsync<MutationRequestConcurrencyException>(() =>
+            manager.Cancel(
+                request.RequestId,
+                MutationContext.User("operator", "Operator", "Cancel request")));
 
-        Assert.Equal(2, store.StoreCount);
+        Assert.Equal(1, store.StoreCount);
         Assert.All(store.GetSnapshots, snapshot => Assert.Equal(MutationRequestStatus.Pending, snapshot.Status));
         Assert.Equal(MutationRequestStatus.Approved, approved.Status);
-        Assert.Equal(MutationRequestStatus.Canceled, canceled.Status);
-        Assert.NotEqual(approved.Status, canceled.Status);
-        Assert.Contains(store.Current.Status, new[] { MutationRequestStatus.Approved, MutationRequestStatus.Canceled });
+        Assert.Equal(request.RequestId, exception.RequestId);
+        Assert.Equal(0, exception.ExpectedRevision);
+        Assert.Equal(MutationRequestStatus.Approved, store.Current.Status);
+        Assert.Equal(1, store.Current.Revision);
     }
 }
