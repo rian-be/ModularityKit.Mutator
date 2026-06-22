@@ -61,6 +61,7 @@ public sealed class MutationRequestStoreContractTests
         };
 
         var rejected = await store.TryStore(staleUpdate, created.Revision);
+
         var loaded = await store.Get(request.RequestId);
 
         Assert.Null(rejected);
