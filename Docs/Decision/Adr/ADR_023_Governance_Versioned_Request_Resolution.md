@@ -4,7 +4,7 @@
 #adr_023
 
 ## Status
-Proposed
+Accepted
 
 ## Date
 2026-06-21
@@ -33,19 +33,33 @@ This is a governance concern, not just a core mutation concern, because it only 
 
 ## Decision
 
-The governance package should adopt explicit version-aware request resolution semantics.
-
-Expected direction:
+The governance package adopts explicit version-aware request resolution semantics.
 
 - `MutationRequest` keeps an `ExpectedStateVersion`
-- request resolution must compare current state version with expected version
-- stale requests must not silently execute without an explicit rule
-- runtime resolution should choose among:
-  - re-validate and execute against latest state
-  - reject as stale
-  - require renewed approval
+- request resolution compares current state version with expected version
+- stale requests do not silently execute
+- governance runtime resolves stale requests through one of three explicit strategies:
+  - `RejectStale`
+  - `RequireRenewedApproval`
+  - `RevalidateOnLatestState`
 
-The exact resolution policy is intentionally left open for the first runtime implementation.
+Current runtime contract:
+
+- matching version, or no expected version:
+  - request receives `VersionValidated`
+  - outcome is `ExecuteApprovedVersion`
+- stale request with `RejectStale`:
+  - request becomes `Rejected`
+  - request receives `RejectedAsStale`
+- stale request with `RequireRenewedApproval`:
+  - request returns to `Pending`
+  - `PendingReason` becomes `Approval`
+  - `ExpectedStateVersion` is updated to the current version
+  - request receives `RenewedApprovalRequired`
+- stale request with `RevalidateOnLatestState`:
+  - request stays `Approved`
+  - `ExpectedStateVersion` is updated to the current version
+  - request receives `RevalidationRequired`
 
 ## Design Rationale
 
@@ -57,15 +71,18 @@ The exact resolution policy is intentionally left open for the first runtime imp
 
 ### Positive
 
-- Governance runtime will have explicit semantics for stale approvals.
+- Governance runtime now has explicit semantics for stale approvals.
 - Deferred execution becomes safer and more auditable.
+- Request decision history reflects stale detection and final resolution path.
 
 ### Negative
 
 - This introduces additional policy and runtime complexity.
 - Different domains may want different stale resolution strategies.
+- Revalidation itself is still a separate runtime step beyond this version-resolution contract.
 
 ## Related ADRs
 
 - ADR-020: Governance MutationRequest Model
 - ADR-021: Governance Pending Mutation Lifecycle
+- ADR-022: Governance Request Decisions and Storage

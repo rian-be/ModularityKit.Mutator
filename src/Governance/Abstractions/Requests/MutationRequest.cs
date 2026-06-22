@@ -1,8 +1,9 @@
 using ModularityKit.Mutator.Abstractions.Context;
 using ModularityKit.Mutator.Abstractions.Intent;
 using ModularityKit.Mutator.Abstractions.Policies;
+using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
 
-namespace ModularityKit.Mutator.Governance;
+namespace ModularityKit.Mutator.Governance.Abstractions.Requests;
 
 /// <summary>
 /// Represents a governed mutation request that may execute immediately or enter a pending lifecycle.
@@ -117,7 +118,11 @@ public sealed record MutationRequest
                 MutationRequestDecision.Create(
                     MutationRequestDecisionType.Submitted,
                     context,
-                    reason: context.Reason)
+                    reason: context.Reason),
+                MutationRequestDecision.Create(
+                    MutationRequestDecisionType.Pending,
+                    context,
+                    reason: $"Request entered pending lifecycle for reason '{pendingReason}'.")
             ]
         };
     }

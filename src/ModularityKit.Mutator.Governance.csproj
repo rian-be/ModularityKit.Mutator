@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+        <RootNamespace>ModularityKit.Mutator</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
