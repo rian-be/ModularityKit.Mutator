@@ -1,7 +1,8 @@
 using ModularityKit.Mutator.Abstractions.Context;
-using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
-using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
-using ModularityKit.Mutator.Governance.Abstractions.Requests;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions.Storage;
+using ModularityKit.Mutator.Governance.Abstractions.Lifecycle.Model;
+using ModularityKit.Mutator.Governance.Abstractions.Requests.Decisions;
+using ModularityKit.Mutator.Governance.Abstractions.Requests.Model;
 using ModularityKit.Mutator.Governance.Runtime.Storage;
 using ModularityKit.Mutator.Governance.Tests.TestSupport;
 using Xunit;
@@ -39,7 +40,7 @@ public sealed class MutationRequestStoreContractTests
             [
                 .. created.Decisions,
                 MutationRequestDecision.Create(
-                    MutationRequestDecisionType.Approved,
+                    MutationRequestDecisionType.Lifecycle(MutationRequestLifecycleDecisionType.Approved),
                     MutationContext.User("approver", "Approver", "Approve request"))
             ]
         };
@@ -55,7 +56,7 @@ public sealed class MutationRequestStoreContractTests
             [
                 .. created.Decisions,
                 MutationRequestDecision.Create(
-                    MutationRequestDecisionType.Canceled,
+                    MutationRequestDecisionType.Lifecycle(MutationRequestLifecycleDecisionType.Canceled),
                     MutationContext.User("operator", "Operator", "Cancel request"))
             ]
         };

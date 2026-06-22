@@ -1,7 +1,7 @@
 using ModularityKit.Mutator.Abstractions.Context;
 using ModularityKit.Mutator.Abstractions.Intent;
-using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
-using ModularityKit.Mutator.Governance.Abstractions.Requests;
+using ModularityKit.Mutator.Governance.Abstractions.Lifecycle.Model;
+using ModularityKit.Mutator.Governance.Abstractions.Requests.Model;
 
 namespace ModularityKit.Mutator.Governance.Tests.TestSupport;
 
