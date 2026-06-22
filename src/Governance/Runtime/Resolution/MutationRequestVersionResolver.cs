@@ -19,33 +19,27 @@ public sealed class MutationRequestVersionResolver : IMutationRequestVersionReso
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(resolutionContext);
 
-        if (string.IsNullOrWhiteSpace(currentStateVersion))
-            throw new ArgumentException("Current state version is required.", nameof(currentStateVersion));
+        var evaluation = MutationRequestVersionEvaluator.Evaluate(request, currentStateVersion);
 
-        var expectedStateVersion = request.ExpectedStateVersion;
-        var isStale = !string.IsNullOrWhiteSpace(expectedStateVersion) &&
-                      !string.Equals(expectedStateVersion, currentStateVersion, StringComparison.Ordinal);
-
-        if (!isStale)
+        if (!evaluation.IsStale)
             return MutationRequestVersionResolutionFactory.BuildValidated(
                 request,
-                expectedStateVersion,
-                currentStateVersion,
+                evaluation,
                 resolutionContext);
 
         return strategy switch
         {
             VersionedRequestResolutionStrategy.RejectStale => MutationRequestVersionResolutionFactory.BuildRejectedAsStale(
                 request,
-                currentStateVersion,
+                evaluation,
                 resolutionContext),
             VersionedRequestResolutionStrategy.RequireRenewedApproval => MutationRequestVersionResolutionFactory.BuildRenewedApprovalRequired(
                 request,
-                currentStateVersion,
+                evaluation,
                 resolutionContext),
             VersionedRequestResolutionStrategy.RevalidateOnLatestState => MutationRequestVersionResolutionFactory.BuildRevalidationRequired(
                 request,
-                currentStateVersion,
+                evaluation,
                 resolutionContext),
             _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, "Unknown stale-resolution strategy.")
         };

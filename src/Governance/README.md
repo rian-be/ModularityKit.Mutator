@@ -35,6 +35,7 @@ Key types:
 - `IMutationRequestStore`
 - `IMutationRequestLifecycleManager`
 - `IMutationRequestVersionResolver`
+- `IMutationRequestVersionResolutionManager`
 - `MutationRequestVersionResolution`
 - `MutationRequestVersionResolutionOutcome`
 - `VersionedRequestResolutionStrategy`
@@ -50,6 +51,7 @@ The initial runtime layer currently provides:
 - `Runtime/Storage/InMemoryMutationRequestStore`
 - `Runtime/Lifecycle/MutationRequestLifecycleManager`
 - `Runtime/Resolution/MutationRequestVersionResolver`
+- `Runtime/Resolution/MutationRequestVersionResolutionManager`
 
 This keeps the first version small while leaving room for later persistence providers such as Entity Framework Core or PostgreSQL-backed governance stores.
 

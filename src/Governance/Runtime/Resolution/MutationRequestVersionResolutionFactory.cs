@@ -15,24 +15,25 @@ internal static class MutationRequestVersionResolutionFactory
     /// </summary>
     public static MutationRequestVersionResolution BuildValidated(
         MutationRequest request,
-        string? expectedStateVersion,
-        string currentStateVersion,
+        MutationRequestVersionEvaluation evaluation,
         MutationContext resolutionContext)
     {
         var validatedDecision = MutationRequestDecision.Create(
             MutationRequestDecisionType.VersionValidated,
             resolutionContext,
-            reason: string.IsNullOrWhiteSpace(expectedStateVersion)
-                ? "No expected state version was provided. Request can proceed."
-                : $"State version '{currentStateVersion}' matches the expected version.",
-            metadata: CreateVersionMetadata(expectedStateVersion, currentStateVersion));
+            reason: MutationRequestVersionResolutionState.BuildValidatedReason(
+                evaluation.ExpectedStateVersion,
+                evaluation.CurrentStateVersion),
+            metadata: MutationRequestVersionResolutionState.CreateVersionMetadata(
+                evaluation.ExpectedStateVersion,
+                evaluation.CurrentStateVersion));
 
         return new MutationRequestVersionResolution
         {
-            Request = AppendDecision(request, validatedDecision),
+            Request = MutationRequestVersionResolutionState.AppendDecision(request, validatedDecision),
             Outcome = MutationRequestVersionResolutionOutcome.ExecuteApprovedVersion,
-            ExpectedStateVersion = expectedStateVersion,
-            CurrentStateVersion = currentStateVersion,
+            ExpectedStateVersion = evaluation.ExpectedStateVersion,
+            CurrentStateVersion = evaluation.CurrentStateVersion,
             IsStale = false
         };
     }
@@ -42,30 +43,30 @@ internal static class MutationRequestVersionResolutionFactory
     /// </summary>
     public static MutationRequestVersionResolution BuildRejectedAsStale(
         MutationRequest request,
-        string currentStateVersion,
+        MutationRequestVersionEvaluation evaluation,
         MutationContext resolutionContext)
     {
         var decision = MutationRequestDecision.Create(
             MutationRequestDecisionType.RejectedAsStale,
             resolutionContext,
-            reason: BuildStaleReason(request.ExpectedStateVersion!, currentStateVersion),
-            metadata: CreateVersionMetadata(request.ExpectedStateVersion, currentStateVersion));
+            reason: MutationRequestVersionResolutionState.BuildStaleReason(
+                evaluation.ExpectedStateVersion!,
+                evaluation.CurrentStateVersion),
+            metadata: MutationRequestVersionResolutionState.CreateVersionMetadata(
+                evaluation.ExpectedStateVersion,
+                evaluation.CurrentStateVersion));
 
-        var updatedRequest = AppendDecision(
-            request with
-            {
-                Status = MutationRequestStatus.Rejected,
-                PendingReason = null,
-                UpdatedAt = decision.Timestamp
-            },
+        var updatedRequest = MutationRequestVersionResolutionState.ApplyRejectedAsStale(
+            request,
+            evaluation.CurrentStateVersion,
             decision);
 
         return new MutationRequestVersionResolution
         {
             Request = updatedRequest,
             Outcome = MutationRequestVersionResolutionOutcome.RejectedAsStale,
-            ExpectedStateVersion = request.ExpectedStateVersion,
-            CurrentStateVersion = currentStateVersion,
+            ExpectedStateVersion = evaluation.ExpectedStateVersion,
+            CurrentStateVersion = evaluation.CurrentStateVersion,
             IsStale = true
         };
     }
@@ -75,31 +76,30 @@ internal static class MutationRequestVersionResolutionFactory
     /// </summary>
     public static MutationRequestVersionResolution BuildRenewedApprovalRequired(
         MutationRequest request,
-        string currentStateVersion,
+        MutationRequestVersionEvaluation evaluation,
         MutationContext resolutionContext)
     {
         var decision = MutationRequestDecision.Create(
             MutationRequestDecisionType.RenewedApprovalRequired,
             resolutionContext,
-            reason: BuildStaleReason(request.ExpectedStateVersion!, currentStateVersion),
-            metadata: CreateVersionMetadata(request.ExpectedStateVersion, currentStateVersion));
+            reason: MutationRequestVersionResolutionState.BuildStaleReason(
+                evaluation.ExpectedStateVersion!,
+                evaluation.CurrentStateVersion),
+            metadata: MutationRequestVersionResolutionState.CreateVersionMetadata(
+                evaluation.ExpectedStateVersion,
+                evaluation.CurrentStateVersion));
 
-        var updatedRequest = AppendDecision(
-            request with
-            {
-                Status = MutationRequestStatus.Pending,
-                PendingReason = PendingMutationReason.Approval,
-                ExpectedStateVersion = currentStateVersion,
-                UpdatedAt = decision.Timestamp
-            },
+        var updatedRequest = MutationRequestVersionResolutionState.ApplyRenewedApprovalRequired(
+            request,
+            evaluation.CurrentStateVersion,
             decision);
 
         return new MutationRequestVersionResolution
         {
             Request = updatedRequest,
             Outcome = MutationRequestVersionResolutionOutcome.RequiresRenewedApproval,
-            ExpectedStateVersion = request.ExpectedStateVersion,
-            CurrentStateVersion = currentStateVersion,
+            ExpectedStateVersion = evaluation.ExpectedStateVersion,
+            CurrentStateVersion = evaluation.CurrentStateVersion,
             IsStale = true
         };
     }
@@ -109,58 +109,31 @@ internal static class MutationRequestVersionResolutionFactory
     /// </summary>
     public static MutationRequestVersionResolution BuildRevalidationRequired(
         MutationRequest request,
-        string currentStateVersion,
+        MutationRequestVersionEvaluation evaluation,
         MutationContext resolutionContext)
     {
         var decision = MutationRequestDecision.Create(
             MutationRequestDecisionType.RevalidationRequired,
             resolutionContext,
-            reason: BuildStaleReason(request.ExpectedStateVersion!, currentStateVersion),
-            metadata: CreateVersionMetadata(request.ExpectedStateVersion, currentStateVersion));
+            reason: MutationRequestVersionResolutionState.BuildStaleReason(
+                evaluation.ExpectedStateVersion!,
+                evaluation.CurrentStateVersion),
+            metadata: MutationRequestVersionResolutionState.CreateVersionMetadata(
+                evaluation.ExpectedStateVersion,
+                evaluation.CurrentStateVersion));
 
-        var updatedRequest = AppendDecision(
-            request with
-            {
-                Status = MutationRequestStatus.Approved,
-                PendingReason = null,
-                ExpectedStateVersion = currentStateVersion,
-                UpdatedAt = decision.Timestamp
-            },
+        var updatedRequest = MutationRequestVersionResolutionState.ApplyRevalidationRequired(
+            request,
+            evaluation.CurrentStateVersion,
             decision);
 
         return new MutationRequestVersionResolution
         {
             Request = updatedRequest,
             Outcome = MutationRequestVersionResolutionOutcome.RevalidateOnLatestState,
-            ExpectedStateVersion = request.ExpectedStateVersion,
-            CurrentStateVersion = currentStateVersion,
+            ExpectedStateVersion = evaluation.ExpectedStateVersion,
+            CurrentStateVersion = evaluation.CurrentStateVersion,
             IsStale = true
-        };
-    }
-
-    private static MutationRequest AppendDecision(
-        MutationRequest request,
-        MutationRequestDecision decision)
-    {
-        return request with
-        {
-            Decisions = [.. request.Decisions, decision]
-        };
-    }
-
-    private static string BuildStaleReason(string expectedStateVersion, string currentStateVersion)
-    {
-        return $"Request expected state version '{expectedStateVersion}' but current version is '{currentStateVersion}'.";
-    }
-
-    private static IReadOnlyDictionary<string, object> CreateVersionMetadata(
-        string? expectedStateVersion,
-        string currentStateVersion)
-    {
-        return new Dictionary<string, object>
-        {
-            ["ExpectedStateVersion"] = expectedStateVersion ?? string.Empty,
-            ["CurrentStateVersion"] = currentStateVersion
         };
     }
 }

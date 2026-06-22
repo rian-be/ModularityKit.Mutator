@@ -1,5 +1,7 @@
 using ModularityKit.Mutator.Abstractions.Context;
+using ModularityKit.Mutator.Governance.Abstractions.Exceptions;
 using ModularityKit.Mutator.Governance.Abstractions.Lifecycle;
+using ModularityKit.Mutator.Governance.Abstractions.Requests;
 using ModularityKit.Mutator.Governance.Abstractions.Resolution;
 using ModularityKit.Mutator.Governance.Runtime.Resolution;
 using ModularityKit.Mutator.Governance.Runtime.Storage;
@@ -32,5 +34,46 @@ public sealed class MutationRequestVersionResolutionPersistenceTests
         Assert.Equal(3, resolution.Request.Decisions.Count);
         Assert.Equal(MutationRequestStatus.Approved, loaded.Status);
         Assert.Equal(MutationRequestStatus.Rejected, resolution.Request.Status);
+    }
+
+    [Fact]
+    public async Task ResolveAndStore_persists_decision_history_and_state()
+    {
+        var store = new InMemoryMutationRequestStore();
+        var resolver = new MutationRequestVersionResolver();
+        var manager = new MutationRequestVersionResolutionManager(store, resolver);
+        var request = await store.Create(MutationRequestTestFactory.CreateApprovedSecurityRequest("v10"));
+
+        var resolution = await manager.ResolveAndStore(
+            request.RequestId,
+            currentStateVersion: "v15",
+            resolutionContext: MutationContext.User("approver", "Approver", "Resolve request"),
+            strategy: VersionedRequestResolutionStrategy.RejectStale);
+
+        var loaded = await store.Get(request.RequestId);
+
+        Assert.NotNull(loaded);
+        Assert.Equal(3, loaded.Decisions.Count);
+        Assert.Equal(MutationRequestDecisionType.RejectedAsStale, loaded.Decisions[^1].Type);
+        Assert.Equal(MutationRequestStatus.Rejected, loaded.Status);
+        Assert.Equal(1, loaded.Revision);
+        Assert.Equal(loaded, resolution.Request);
+    }
+
+    [Fact]
+    public async Task ResolveAndStore_throws_not_found_for_missing_request()
+    {
+        var store = new InMemoryMutationRequestStore();
+        var resolver = new MutationRequestVersionResolver();
+        var manager = new MutationRequestVersionResolutionManager(store, resolver);
+
+        var exception = await Assert.ThrowsAsync<MutationRequestNotFoundException>(() =>
+            manager.ResolveAndStore(
+                "missing-request",
+                currentStateVersion: "v15",
+                resolutionContext: MutationContext.User("approver", "Approver", "Resolve request"),
+                strategy: VersionedRequestResolutionStrategy.RejectStale));
+
+        Assert.Equal("missing-request", exception.RequestId);
     }
 }

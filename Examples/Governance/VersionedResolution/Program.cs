@@ -1,3 +1,3 @@
 using VersionedResolution.Scenarios;
 
-GovernanceVersionedResolutionScenario.Run();
+await GovernanceVersionedResolutionScenario.Run();
