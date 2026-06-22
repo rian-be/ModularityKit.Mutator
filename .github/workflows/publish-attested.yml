@@ -25,7 +25,7 @@ jobs:
       - name: Download published artifacts
         uses: actions/download-artifact@v6
         with:
-          pattern: ModularityKit.Mutator-nupkg
+          pattern: ModularityKit-packages
           path: dist
           merge-multiple: true
 
