@@ -11,7 +11,9 @@
     <Project Path="Examples/Governance/RequestLifecycle/RequestLifecycle.csproj" />
     <Project Path="Examples/Governance/VersionedResolution/VersionedResolution.csproj" />
   </Folder>
-  <Folder Name="/Tests/" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/ModularityKit.Mutator.Governance.Tests/ModularityKit.Mutator.Governance.Tests.csproj" />
+  </Folder>
   <Folder Name="/Benchmarks/">
     <Project Path="Benchmarks/ModularityKit.Mutator.Benchmarks.csproj" />
   </Folder>
